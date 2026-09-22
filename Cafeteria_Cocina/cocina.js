@@ -1,7 +1,15 @@
 
 
 
-const productos = ["Espresso", "americano", "cappuccino", "latte", "mocha" ];
+const productos=[{producto: "Espresso", precio: 600},
+                {producto: "Americano", precio: 50},
+                {producto: "Cappuccino", precio: 550},
+                {producto: "Latte", precio: 70},
+                {producto: "Mocha", precio: 30}
+];
+
+const productosBaratos = productos.filter(producto => producto.precio < 100)
+const productosCaros = productos.filter(producto => producto.precio > 100)
 
 const readline = require('readline');
 const rl = readline.createInterface({
@@ -13,9 +21,8 @@ const rl = readline.createInterface({
 console.log("------------- COCINA ---------------");
 console.log("");
 
-productos.forEach((productos, indice) =>{
-    console.log(indice + 1, " " + productos);
-});
+console.log(productos);
+
 console.log("");
 console.log("1 - Agregar producto");
 console.log("2 - Editar producto");
@@ -64,10 +71,28 @@ rl.close();
     if(opcion == 4){
         console.log("MENÚ");
         console.log("");
-        productos.forEach((productos, indice) =>{
-        console.log(indice + 1, " " + productos);
-});
-rl.close();
+
+        console.log("1 - Productos baratos");
+        console.log("2 - Productos caros");
+        console.log("3 - bebidas");
+        console.log("4 - Postres");
+
+        rl.question("Elija una opción", (opcion2)=>{
+            if(opcion2 == 1){
+                console.log(productosBaratos);
+            }else
+                if(opcion2 == 2){
+                console.log(productosCaros);
+            }
+
+            rl.close();
+        });
+        
+
+        
+
+
+    
     }
 
 });
