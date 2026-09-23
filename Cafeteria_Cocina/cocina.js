@@ -43,6 +43,11 @@ function menuPrincipal(){
     console.log("5 - Salir");
 
     rl.question("Seleccione una opcion ", (opcionMenu) => {
+        if(opcionMenu <1 || opcionMenu >5){
+            console.log("");
+            console.log("x- Opcion no valida -x");
+            menuPrincipal();
+        }else
     if(opcionMenu == 1){
         mostrarProductos();
         menuPrincipal();
@@ -145,7 +150,7 @@ function filtros(){
         } else if(opcionBusqueda == 5){
             rl.question("Nombre del producto: ", (productoNoExacto)=>{
                 const busquedaNoEx = productos.filter((producto)=>{
-                    return producto.producto.includes(productoNoExacto);
+                    return producto.producto.toLocaleLowerCase().includes(productoNoExacto.toLocaleLowerCase());
                 });
                 if(busquedaNoEx.length > 0){
                     busquedaNoEx.forEach((producto, indice)=>{
@@ -160,7 +165,7 @@ function filtros(){
             rl.question("Nombre exacto del producto: ", (productoExacto)=>{
                 const busquedaEsp = productos.find((producto)=>{
 
-                    return producto.producto == productoExacto;
+                    return producto.producto.toLocaleLowerCase() == productoExacto.toLocaleLowerCase();
                     
                 });
                 if(busquedaEsp){
@@ -213,7 +218,11 @@ function editarProducto(array){
         console.log("5 - Regresar");
 
         rl.question("Seleccione una opción  ", (opcionEditar) =>{
-
+            if(opcionEditar< 0|| opcionEditar>5){
+                console.log("");
+                console.log("x- Opcion no valida -x");
+                editarProducto(array);
+            }else
             if(opcionEditar == 1){
                 rl.question("Ingrese el nuevo nombre del producto: ", (nombreEditado) =>{
                     array[posicionEditar-1].producto = nombreEditado;
@@ -308,6 +317,11 @@ function gestionarProductos(){
     console.log("5 - Regresar");
 
     rl.question("Seleccione una opcion: ", (opcionGestion) =>{
+        if(opcionGestion < 1 || opcionGestion >5){
+            console.log("");
+            console.log("x- Opcion no valida -x");
+            gestionarProductos();
+        }else
         if(opcionGestion == 1){
             agregarProducto();
         }else if(opcionGestion == 2){
