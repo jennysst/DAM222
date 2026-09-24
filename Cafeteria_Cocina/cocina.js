@@ -1,10 +1,12 @@
 
 
+/*const { rejects } = require('assert');
+const { resolve } = require('dns');
 const readline = require('readline');
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
-});
+});*/
 
 const productos=[{producto: "Espresso", precio: 600, tipo: "bebida", id: 1},
                 {producto: "Americano", precio: 50, tipo: "bebida", id: 2},
@@ -14,6 +16,44 @@ const productos=[{producto: "Espresso", precio: 600, tipo: "bebida", id: 1},
                 {producto: "Pastel de fresa", precio: 40, tipo: "postre", id: 6},
                 {producto: "Pastel de chocolate", precio: 40, tipo: "postre", id: 7}
 ];
+
+
+function prepararBebida(pedido){
+    return new Promise((resolve, reject)=>{
+        console.log(" ");
+        console.log("Pedido: ", pedido, "---Preparando---");
+        console.log(" ");
+        setTimeout(()=>{
+        const aleatorio = Math.random();
+        if(aleatorio < 0.60){
+            resolve("Exito!");
+        }else if(aleatorio < 0.80){
+            reject("Error en cocina");
+        }else{
+            reject("Faltan ingredientes");
+        }
+        } ,1500);
+    });
+    
+};
+
+async function simulacion() {
+    console.log("------SIMULACIÓN------");
+    const pedidos = ["Espresso", "Cappuccino", "Mocha", "Latte"];
+
+    for(const producto of pedidos){
+        try{
+            const resul = await prepararBebida(producto);
+            console.log(resul);
+        }catch(error){
+            console.log(error);
+        }
+    }
+
+}
+
+simulacion();
+
 
 const promociones = new Map();
 promociones.set(1, {nombre: "2x1 en Espresso", productos: [1]});
@@ -28,7 +68,7 @@ promociones.set(4, {nombre: "3x1 en Mocha", productos: [5]});
 
 
 let estado = 0;
-menuPrincipal();
+//menuPrincipal();
 
 //console.log(productos);
 
