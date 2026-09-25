@@ -8,71 +8,27 @@ const rl = readline.createInterface({
     output: process.stdout
 });*/
 
-const productos=[{producto: "Espresso", precio: 600, tipo: "bebida", id: 1},
-                {producto: "Americano", precio: 50, tipo: "bebida", id: 2},
-                {producto: "Cappuccino", precio: 50, tipo: "bebida", id: 3},
-                {producto: "Latte", precio: 70, tipo: "bebida", id: 4},
-                {producto: "Mocha", precio: 30, tipo: "bebida", id: 5},
-                {producto: "Pastel de fresa", precio: 40, tipo: "postre", id: 6},
-                {producto: "Pastel de chocolate", precio: 40, tipo: "postre", id: 7}
+const readline = require('readline');
+
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
+const listaProductos=[{nombreProducto: "Espresso", precio: 100, categoría: "bebida", id:1, stock: 0},
+                    {nombreProducto: "Americano", precio: 50, categoría: "bebida", id:2, stock: 0},
+                    {nombreProducto: "Cappuccino", precio: 89, categoría: "bebida", id:3, stock: 0},
+                    {nombreProducto: "Pastel de fresa", precio: 35, categoría: "postre", id:4, stock: 0},
+                    {nombreProducto: "Pastel de chocolate", precio: 150, categoría: "bebida", id:5, stock: 0}
 ];
 
+const listaPedidos=new Map();
 
-function prepararBebida(pedido){
-    return new Promise((resolve, reject)=>{
-        console.log(" ");
-        console.log("Pedido: ", pedido, "---Preparando---");
-        console.log(" ");
-        setTimeout(()=>{
-        const aleatorio = Math.random();
-        if(aleatorio < 0.60){
-            resolve("Exito!");
-        }else if(aleatorio < 0.80){
-            reject("Error en cocina");
-        }else{
-            reject("Faltan ingredientes");
-        }
-        } ,1500);
-    });
-    
-};
+listaPedidos.set("Jenny",{listaProductosDelPedido: [1, 2, 3], subtotal: 130, status: false, descripcion: ""});
 
-async function simulacion() {
-    console.log("------SIMULACIÓN------");
-    const pedidos = ["Espresso", "Cappuccino", "Mocha", "Latte"];
+const listaPromociones=[{productoEnPromocion: 1 , mensaje: "2x1 en Espresso"}];
 
-    for(const producto of pedidos){
-        try{
-            const resul = await prepararBebida(producto);
-            console.log(resul);
-        }catch(error){
-            console.log(error);
-        }
-    }
-
-}
-
-simulacion();
-
-
-const promociones = new Map();
-promociones.set(1, {nombre: "2x1 en Espresso", productos: [1]});
-promociones.set(2, {nombre: "3x1 en Cappuccino", productos: [3]});
-promociones.set(3, {nombre: "2x1 en Pastel de fresa", productos: [6]});
-promociones.set(4, {nombre: "3x1 en Mocha", productos: [5]});
-
-
-//promociones.set(2, {nombre: "pastel de fresa + cappuccino", productos: [3, 6], precio: 70});
-
-
-
-
-let estado = 0;
-//menuPrincipal();
-
-//console.log(productos);
-
-function menuPrincipal(){
+function menuCocina() {
     console.log(" ");
     console.log("------------- COCINA ---------------");
     console.log("");
@@ -80,35 +36,31 @@ function menuPrincipal(){
     console.log("2 - Gestionar productos");
     console.log("3 - Mostrar promociones");
     console.log("4 - Busqueda");
-    console.log("5 - Salir");
-
-    rl.question("Seleccione una opcion ", (opcionMenu) => {
-        if(opcionMenu <1 || opcionMenu >5){
-            console.log("");
-            console.log("x- Opcion no valida -x");
-            menuPrincipal();
-        }else
-    if(opcionMenu == 1){
-        mostrarProductos();
-        menuPrincipal();
-    } else if(opcionMenu == 2){
-        gestionarProductos();
-    }else if(opcionMenu == 3){
-        console.log(" ");
-        console.log("--------PROMOCIONES---------");
-        promociones.forEach((promocion, id) => {
-            console.log(promocion.nombre);
-        });
-        menuPrincipal();
-    } else if(opcionMenu == 4){
-        filtros();
-    }else if(opcionMenu == 5){
-        rl.close();
-    }
-});
+    console.log("5 - Procesar pedido");
+    console.log("6 - Salir");
 }
 
-function filtros(){
+function menuGestionarProductos(){
+    console.log("");
+    console.log("------------ GESTIONAR PRODUCTOS -------------");
+    console.log("1 - Agregar producto");
+    console.log("2 - Editar producto");
+    console.log("3 - Eliminar producto");
+    console.log("4 - Listar productos");
+    console.log("5 - Regresar");
+}
+
+function menuEditarProducto(){
+    console.log("1 - Editar nombre de el producto");
+    console.log("2 - Editar precio de el producto");
+    console.log("3 - Editar categoria de el producto");
+    console.log("4 - Editar id de el producto");
+    console.log("5 - Editar stock de el producto");
+    console.log("6 - Regresar");
+
+}
+
+function menuBusqueda(){
     console.log("");
     console.log("--------- BUSQUEDA --------");
     console.log("");
@@ -117,345 +69,416 @@ function filtros(){
     console.log("3 - Buscar bebidas");
     console.log("4 - Buscar postres");
     console.log("5 - Buscar producto por coincidencia");
-    console.log("6 - Buscar producto especifico");
+    console.log("6 - Buscar producto por ID");
     console.log("7 - Regresar");
-
-    rl.question("Elija una opcion: ", (opcionBusqueda)=>{
-        
-        if(opcionBusqueda == 1){
-            console.log(" ");
-            console.log("----PRODUCTOS CAROS-----");
-            const productosCaros = productos.filter(producto => producto.precio > 100);
-            productosCaros.forEach((productos, indice)=> {
-                console.log(indice+1, " ", productos.producto, " $", productos.precio);
-            });
-            rl.question("¿Desea editar algun producto? (si no)",(filtroEditar)=>{
-                estado = 1;
-                if(filtroEditar == "si"){
-                    editarProducto(productosCaros);
-                }else{
-                    filtros();
-                }
-            });
-            
-        }else if(opcionBusqueda == 2){
-            console.log(" ");
-            console.log("----PRODUCTOS BARATOS----");
-            const productosBaratos = productos.filter(producto => producto.precio <= 100);
-            productosBaratos.forEach((productos, indice)=> {
-                console.log(indice+1, " ", productos.producto, " $", productos.precio);
-            });
-            rl.question("¿Desea editar algun producto? (si no)",(filtroEditar)=>{
-                estado = 1;
-                if(filtroEditar == "si"){
-                    editarProducto(productosBaratos);
-                }else{
-                    filtros();
-                }
-            });
-        } else if(opcionBusqueda == 3){
-            console.log(" ");
-            console.log("----BEBIDAS----");
-            const bebidas = productos.filter((productos) =>{
-                return productos.tipo == "bebida";
-            });
-            bebidas.forEach((producto, indice)=> {
-                console.log(indice+1, " ", producto.producto," $", producto.precio);
-            });
-            rl.question("¿Desea editar algun producto? (si no)",(filtroEditar)=>{
-                estado = 1;
-                if(filtroEditar == "si"){
-                    editarProducto(bebidas);
-                }else{
-                    filtros();
-                }
-            });
-        } else if(opcionBusqueda == 4){
-            console.log(" ");
-            console.log("-----POSTRES----");
-            const postre = productos.filter((productos) =>{
-                return productos.tipo == "postre";
-            });
-            postre.forEach((producto, indice)=> {
-                console.log(indice+1, " ", producto.producto," $", producto.precio);
-            });
-            rl.question("¿Desea editar algun producto? (si no)",(filtroEditar)=>{
-                estado = 1;
-                if(filtroEditar == "si"){
-                    editarProducto(postre);
-                }else{
-                    filtros();
-                }
-            });
-        } else if(opcionBusqueda == 5){
-            rl.question("Nombre del producto: ", (productoNoExacto)=>{
-                const busquedaNoEx = productos.filter((producto)=>{
-                    return producto.producto.toLocaleLowerCase().includes(productoNoExacto.toLocaleLowerCase());
-                });
-                if(busquedaNoEx.length > 0){
-                    busquedaNoEx.forEach((producto, indice)=>{
-                        console.log(indice + 1, " ", producto.producto, " $", producto.precio);
-                    });
-                }else{
-                    console.log("No se encontraron productos");
-                }
-                filtros();
-            });
-        } else if(opcionBusqueda == 6){
-            rl.question("Nombre exacto del producto: ", (productoExacto)=>{
-                const busquedaEsp = productos.find((producto)=>{
-
-                    return producto.producto.toLocaleLowerCase() == productoExacto.toLocaleLowerCase();
-                    
-                });
-                if(busquedaEsp){
-                        console.log("producto: ", busquedaEsp.producto," $", busquedaEsp.precio);
-                        filtros();
-                    }else{
-                        console.log("Producto no encontrado");
-                        filtros();
-                    }
-            });
-        } else if(opcionBusqueda == 7){
-            menuPrincipal();
-        }
-
-    });
-
 }
 
-function mostrarProductos(){
+function mostrarPromociones(){
+    listaPromociones.forEach((promocion, id)=>{
+        console.log(id, " ",promocion.mensaje);
+    });
+}
+
+function mostrarProductosCocina(array){
     console.log(" ");
     console.log("------------ PRODUCTOS -------------");
-    productos.forEach((producto, indice) =>{
-        console.log(indice + 1, " ", producto.producto, " : $", producto.precio);
+    array.forEach((producto) =>{
+        console.log(producto.id, " ", producto.nombreProducto, " : $", producto.precio, "| Categoria:", producto.categoría, "| Stock:", producto.stock);
     });
 
 }
 
-function agregarProducto(){
+async function agregarProducto(array){
     console.log(" ");
     console.log("-------AGREGAR PRODUCTO--------");
-    rl.question("¿Que producto desea agregar? ", (nuevoProducto) =>{
-        rl.question("¿Cual es el precio del nuevo producto? ", (nuevoPrecio) => {
-            rl.question("¿Cual es el tipo del nuevo producto? ", (nuevoTipo) => {
-            productos.push({producto: nuevoProducto, precio: Number(nuevoPrecio), tipo: nuevoTipo});
-            gestionarProductos(productos);
-            });
-        });
-    });
+    let nuevoProducto = await preguntar("Introduce el nombre del producto: ");
+    let nuevoPrecio = await preguntar("Introduce el precio del producto: ");
+    let nuevoTipo = await preguntar("Introduce el tipo del producto: ");
+    let nuevoId = await preguntar("Introduce el id del producto: ");
+    let nuevoStock = await preguntar("Introduce el stock del producto: ");
     
+    array.push({nombreProducto: nuevoProducto, precio: Number(nuevoPrecio), categoría: nuevoTipo, id: Number(nuevoId), stock: Number(nuevoStock)});
+
+    console.log("---- PRODUCTO AGREGADO ----");
+    console.log(" ");
+    console.log(Number(nuevoId), " ",nuevoProducto, " : $", Number(nuevoPrecio), " ", nuevoTipo, " ", Number(nuevoStock));
+    console.log("-----------------------------------------");
 }
 
-function editarProducto(array){
+function preguntar(pregunta) {
+    return new Promise((resolve) => {
+        rl.question(pregunta, (respuesta) => {
+            resolve(respuesta);
+        });
+    });
+}
+
+async function editarProducto(array) {
     console.log(" ");
     console.log("------EDITAR PRODUCTOS-----");
-    rl.question("¿Que producto desea editar? ", (posicionEditar)=>{
-        console.log("1 - Editar nombre de el producto");
-        console.log("2 - Editar precio de el producto");
-        console.log("3 - Editar tipo de el producto");
-        console.log("4 - Editar nombre y precio de el producto");
-        console.log("5 - Regresar");
+    console.log(" ");
+    let opcionEditar;
+    let posicionEditar;
+    do{
+        
+        menuEditarProducto();
+        opcionEditar = await preguntar("Seleccione una opción: ");
 
-        rl.question("Seleccione una opción  ", (opcionEditar) =>{
-            if(opcionEditar< 0|| opcionEditar>5){
-                console.log("");
-                console.log("x- Opcion no valida -x");
-                editarProducto(array);
-            }else
+        if(opcionEditar<1 || opcionEditar >6){
+            console.log("xx - OPCIÓN NO VALIDA - xx");
+        } else {
+            mostrarProductosCocina(array);
+            console.log(" ");
             if(opcionEditar == 1){
-                rl.question("Ingrese el nuevo nombre del producto: ", (nombreEditado) =>{
-                    array[posicionEditar-1].producto = nombreEditado;
-                    rl.question("¿Desea editar otro producto? (si no)", (otroEditar) =>{
-                        if(otroEditar == "si"){
-                            editarProducto(array);
-                        }else{
-                            if(estado == 1){
-                                filtros();
-                            }else{
-                                gestionarProductos();
-                            }
-                        }
-                    });
+                posicionEditar = await preguntar("¿Que producto desea editar?");
+
+                let productoEditar = array.find((producto)=>{
+                    return producto.id == posicionEditar;   
                 });
-            } else if (opcionEditar == 2){
-                rl.question("Ingrese el nuevo precio del producto: ", (precioEditado) =>{
-                    array[posicionEditar-1].precio = Number(precioEditado);
-                    rl.question("¿Desea editar otro producto? (si no)", (otroEditar) =>{
-                        if(otroEditar == "si"){
-                            editarProducto(array);
-                        }else{
-                            if(estado == 1){
-                                filtros();
-                            }else{
-                                gestionarProductos();
-                            }
-                        }
-                    });
-                });
-            } else if(opcionEditar == 3){
-                rl.question("Ingrese el nuevo tipo del producto: ", (tipoEditado) =>{
-                    array[posicionEditar-1].tipo = tipoEditado;
-                    rl.question("¿Desea editar otro producto? (si no)", (otroEditar) =>{
-                        if(otroEditar == "si"){
-                            editarProducto(array);
-                        }else{
-                            if(estado == 1){
-                                filtros();
-                            }else{
-                                gestionarProductos();
-                            }
-                        }
-                    });
-                });
-            } else if(opcionEditar == 4){
-                rl.question("Ingrese el nuevo nombre del producto: ", (nombreEditado) =>{
-                    rl.question("Ingrese el nuevo precio del producto: ", (precioEditado) =>{
-                        array[posicionEditar-1].producto = nombreEditado;
-                        array[posicionEditar-1].precio = Number(precioEditado);
-                        rl.question("¿Desea editar otro producto? (si no)", (otroEditar) =>{
-                            if(otroEditar == "si"){
-                                editarProducto(array);
-                            }else
-                                if(estado == 1){
-                                filtros();
-                            }else{
-                                gestionarProductos();
-                            }
-                            
-                        });
-                    });
-                });
-            } else if(opcionEditar == 5){
-                if(estado == 1){
-                    filtros();
+
+                if(productoEditar){
+                    let nombreEditado = await preguntar("Ingrese el nuevo nombre del producto: ");
+                    productoEditar.nombreProducto = nombreEditado;
+                    
+                    console.log(" ");
+                    console.log("---------------------------");
+                    console.log(productoEditar.id," ",productoEditar.nombreProducto, " : $", productoEditar.precio, " |Categoria: ",productoEditar.categoría, "| Stock:", productoEditar.stock);
+                    console.log(" ");
+
                 }else{
-                    gestionarProductos();
+                    console.log("No se encontro el ID");
+                }
+                
+                //EDITAR LAS DEMAS OPCIONES  Y AÑADIR STOCK Y ID---
+            }else if(opcionEditar == 2){
+                posicionEditar = await preguntar("¿Que producto desea editar?");
+
+                
+                let productoEditar = array.find((producto)=>{
+                    return producto.id == posicionEditar;   
+                });
+
+                if(productoEditar){
+                    let precioEditado = await preguntar("Ingrese el nuevo precio del producto: ");
+                    productoEditar.precio = Number(precioEditado);
+                    
+                    console.log(" ");
+                    console.log("---------------------------");
+                    console.log(productoEditar.id," ",productoEditar.nombreProducto, " : $", productoEditar.precio, " |Categoria: ",productoEditar.categoría, "| Stock:", productoEditar.stock);
+                    console.log(" ");
+
+                }else{
+                    console.log("No se encontro el ID");
+                }
+
+                /*let precioEditado = await preguntar("Ingrese el nuevo precio del producto: ");
+                array[posicionEditar-1].precio = Number(precioEditado);
+
+                console.log(" ");
+                console.log("---------------------------");
+                console.log(array[posicionEditar-1].producto, " : $", array[posicionEditar-1].precio, " Tipo: ", array[posicionEditar-1].tipo);
+                console.log(" ");*/
+
+            }else if(opcionEditar == 3){
+                posicionEditar = await preguntar("¿Que producto desea editar?");
+
+                let productoEditar = array.find((producto)=>{
+                    return producto.id == posicionEditar;   
+                });
+
+                if(productoEditar){
+                    let tipoEditado = await preguntar("Ingrese la nueva categoría del producto: ");
+                    productoEditar.categoría = tipoEditado;
+                    
+                    console.log(" ");
+                    console.log("---------------------------");
+                    console.log(productoEditar.id," ",productoEditar.nombreProducto, " : $", productoEditar.precio, " |Categoria: ",productoEditar.categoría, "| Stock:", productoEditar.stock);
+                    console.log(" ");
+
+                }else{
+                    console.log("No se encontro el ID");
+                }
+
+                /*let tipoEditado = await preguntar("Ingrese la nueva categoría del producto: ");
+                array[posicionEditar-1].tipo = tipoEditado;
+
+                console.log(" ");
+                console.log("---------------------------");
+                console.log(array[posicionEditar-1].producto, " : $", array[posicionEditar-1].precio, " Tipo: ", array[posicionEditar-1].tipo);
+                console.log(" ");*/
+            }else if(opcionEditar == 4){
+                posicionEditar = await preguntar("¿Que producto desea editar?");
+
+                let productoEditar = array.find((producto)=>{
+                    return producto.id == posicionEditar;   
+                });
+
+                if(productoEditar){
+                    let idEditado = await preguntar("Ingrese el nuevo id del producto: ");
+                    productoEditar.id = Number(idEditado);
+                    
+                    console.log(" ");
+                    console.log("---------------------------");
+                    console.log(productoEditar.id," ",productoEditar.nombreProducto, " : $", productoEditar.precio, " |Categoria: ",productoEditar.categoría, "| Stock:", productoEditar.stock);
+                    console.log(" ");
+
+                }else{
+                    console.log("No se encontro el ID");
+                }
+                
+            }else if(opcionEditar == 5){
+                posicionEditar = await preguntar("¿Que producto desea editar?");
+
+                let productoEditar = array.find((producto)=>{
+                    return producto.id == posicionEditar;   
+                });
+
+                if(productoEditar){
+                    let stockEditado = await preguntar("Ingrese el nuevo stock del producto: ");
+                    productoEditar.stock = Number(stockEditado);
+                    
+                    console.log(" ");
+                    console.log("---------------------------");
+                    console.log(productoEditar.id," ",productoEditar.nombreProducto, " : $", productoEditar.precio, " |Categoria: ",productoEditar.categoría, "| Stock:", productoEditar.stock);
+                    console.log(" ");
+
+                }else{
+                    console.log("No se encontro el ID");
                 }
                 
             }
-        });
-    });
+        }
+    }while(opcionEditar != 6);
 }
 
-function eliminarProducto(){
+async function eliminarProducto(array) {
     console.log(" ");
     console.log("------ELIMINAR PRODUCTO-----");
-    rl.question("¿Cual es el producto que desea eliminar? ", (posicionEliminar)=>{
-        productos.splice(posicionEliminar-1, 1);
-        gestionarProductos();
+    mostrarProductosCocina(array);
+    console.log(" ");
+    let productoEliminar = await preguntar("¿Cual es el producto que desea eliminar? ");
+
+    let posicionEliminar = array.findIndex((producto)=>{
+        return producto.id == productoEliminar;   
     });
+
+    if(posicionEliminar != -1){
+        array.splice(posicionEliminar, 1);
+        console.log("----- Se elimino el producto ----");
+
+    }else{
+        console.log("No se encontro el ID");
+    }
+
 }
 
-function gestionarProductos(){
-    console.log("");
-    console.log("------------ GESTIONAR PRODUCTOS -------------");
-    console.log("1 - Agregar producto");
-    console.log("2 - Editar producto");
-    console.log("3 - Eliminar producto");
-    console.log("4 - Listar productos");
-    console.log("5 - Regresar");
-
-    rl.question("Seleccione una opcion: ", (opcionGestion) =>{
-        if(opcionGestion < 1 || opcionGestion >5){
-            console.log("");
-            console.log("x- Opcion no valida -x");
-            gestionarProductos();
-        }else
-        if(opcionGestion == 1){
-            agregarProducto();
-        }else if(opcionGestion == 2){
-            estado = 2;
-            editarProducto(productos);
+async function gestionarProductos(array) {
+    let opcionGestion;
+    console.log("-------GESTIONAR PRODUCTOS--------");
+    do{
+        menuGestionarProductos();
+        console.log(" ");
+        opcionGestion = await preguntar("Selecciona una opcion: ");
+         if(opcionGestion<1 || opcionGestion >5){
+            console.log("---------------");
+            console.log("xx - OPCIÓN NO VALIDA - xx");
+            console.log("---------------");
+        } else if(opcionGestion == 1){
+            await agregarProducto(array);
+        } else if(opcionGestion == 2){
+            await editarProducto(array);
         } else if(opcionGestion == 3){
-            eliminarProducto();
+            await eliminarProducto(array);
         } else if(opcionGestion == 4){
-            mostrarProductos();
-            gestionarProductos(productos);
-        } else if(opcionGestion == 5){
-            menuPrincipal();
+            mostrarProductosCocina(array);
         }
-    });
+    }while(opcionGestion != 5);
+}
 
-    
+async function filtros(array) {
+    let opcionBusqueda;
+    do{
+        menuBusqueda();
+        opcionBusqueda = await preguntar("Elija una opcion:");
+        if(opcionBusqueda<1 || opcionBusqueda >7){
+            console.log("xx - OPCIÓN NO VALIDA - xx");
+        } else if(opcionBusqueda == 1){
+            console.log(" ");
+            console.log("----PRODUCTOS CAROS-----");
+
+            const productosCaros = array.filter(producto => producto.precio > 100);
+            productosCaros.forEach((productos, indice)=> {
+                console.log(productos.id, " ", productos.nombreProducto, " $", productos.precio);
+            });
+
+            if(productosCaros.length>0){
+                let filtroEditar = await preguntar("¿Desea editar algun producto? (si/no)");
+                //estado = 1;
+                if(filtroEditar == "si"){
+                    await editarProducto(productosCaros);
+                }
+            }else{
+                console.log("No se encontraron productos");
+            }
+            
+            //EDITAR LAS DEMAS OPCIONES
+
+        } else if(opcionBusqueda == 2){
+            console.log(" ");
+            console.log("----PRODUCTOS BARATOS----");
+
+            const productosBaratos = array.filter(producto => producto.precio <= 100);
+            productosBaratos.forEach((productos, indice)=> {
+                console.log(productos.id, " ", productos.nombreProducto, " $", productos.precio);
+            });
+
+            if(productosBaratos.length>0){
+                let filtroEditar = await preguntar("¿Desea editar algun producto? (si/no)");
+                
+                if(filtroEditar == "si"){
+                    await editarProducto(productosBaratos);
+                }
+            }else{
+                console.log("No se encontraron productos");
+            }
+
+        } else if(opcionBusqueda == 3){
+            console.log(" ");
+            console.log("----BEBIDAS----");
+            const bebidas = array.filter((productos) =>{
+                return productos.categoría == "bebida";
+            });
+            bebidas.forEach((producto, indice)=> {
+                console.log(producto.id, " ", producto.nombreProducto, " $", producto.precio);
+            });
+
+            if(bebidas.length>0){
+                let filtroEditar = await preguntar("¿Desea editar algun producto? (si/no)");
+                
+                if(filtroEditar == "si"){
+                    await editarProducto(bebidas);
+                }
+            }else{
+                console.log("No se encontraron productos");
+            }
+            
+        } else if(opcionBusqueda == 4){
+            console.log(" ");
+            console.log("-----POSTRES----");
+            const postre = array.filter((productos) =>{
+                return productos.categoría == "postre";
+            });
+            postre.forEach((producto, indice)=> {
+                console.log(producto.id, " ", producto.nombreProducto, " $", producto.precio);
+            });
+            if(postre.length>0){
+                let filtroEditar = await preguntar("¿Desea editar algun producto? (si/no)");
+                
+                if(filtroEditar == "si"){
+                    await editarProducto(postre);
+                }
+            }else{
+                console.log("No se encontraron productos");
+            }
+
+        } else if(opcionBusqueda == 5){
+            let nombreBusqueda = await preguntar("Nombre del producto: ");
+            const busquedaProducto = array.filter((producto)=>{
+                    return producto.nombreProducto.toLocaleLowerCase().includes(nombreBusqueda.toLocaleLowerCase());
+                });
+                if(busquedaProducto.length > 0){
+                    busquedaProducto.forEach((producto, indice)=>{
+                        console.log(producto.id, " ", producto.nombreProducto, " $", producto.precio);
+                    });
+                    let filtroEditar = await preguntar("¿Desea editar algun producto? (si/no)");
+                    if(filtroEditar == "si"){
+                        await editarProducto(busquedaProducto);
+                    }
+                }else{
+                    console.log("No se encontraron productos");
+                }
+        } else if(opcionBusqueda == 6){
+            let busquedaId = await preguntar("Ingrese el id: ");
+            let productoID = array.find((producto)=>{
+                return producto.id == busquedaId;
+            });
+            if(productoID){
+                console.log(productoID.id, " ",productoID.nombreProducto, ":$",productoID.precio);
+            }else{
+                console.log("No se encontraron productos");
+            }
+        }
+
+    }while(opcionBusqueda != 7)
+}
+
+async function mainCocina(array, nombrePedido) {
+    let opcionCocina;
+    do{
+        menuCocina();
+        opcionCocina = await preguntar("Seleccione una opción: ");
+        if(opcionCocina<1 || opcionCocina >6){
+            console.log("xx - OPCIÓN NO VALIDA - xx");
+        } else if(opcionCocina == 1){
+            mostrarProductosCocina(array);
+        } else if(opcionCocina == 2){
+            await gestionarProductos(array);
+        } else if(opcionCocina == 3){
+            mostrarPromociones();
+        } else if(opcionCocina == 4){
+            await filtros(array);
+        } else if(opcionCocina == 5){
+            await statusPedido(nombrePedido);
+        } 
+
+    }while(opcionCocina != 6)
+        rl.close();
 }
 
 
+function prepararPedidio(nombrePedido){
+    return new Promise ((resolve, reject) =>{
+        console.log("------------");
+        console.log("Preparando pedido de: ",  nombrePedido);
+        console.log("------------");
 
-/* rl.question("Elija una opción", (opcionCocina)=>{
+        setTimeout(() =>{
+            let resultado = Math.floor(Math.random()*3);
+            if(resultado == 0){
+                reject("Error en cocina");
+            }else if(resultado == 1){
+                reject("Falta de ingredientes");
+            }else{
+                resolve("Exito");
+            }
+        }, 4000);
 
-    if(opcionCocina == 1){
-        rl.question("¿Que desea agregar?",(p)=>{
-            productos.push(p);
-            productos.forEach((productos, indice) =>{
-            console.log(indice + 1, " " + productos);
-});
-rl.close();
     });
-    
+}
+
+async function statusPedido(nombrePedido) {
+    let pedido = listaPedidos.get(nombrePedido);
+    if(!pedido){
+        console.log("No se encontro el pedido");
+        return;
     }
-    else
-    if(opcionCocina == 2){
-        rl.question("¿Cual es la posicion del producto a editar?",(po)=>{
-            rl.question("¿Cual es el nuevo producto?",(nuevo)=>{
-            productos[po] = nuevo;
-            productos.forEach((productos, indice) =>{
-            console.log(indice + 1, " " + productos);
-});
-rl.close();
-    });
-    
-    });
-    
+    try {
+        let resultado = await prepararPedidio(nombrePedido);
+        pedido.status = true;
+        console.log(resultado);
+        console.log("El pedido se hizo con exito");
+    } catch (error) {
+        pedido.status = false;
+        console.log("El pedido tuvo un problema");
+        console.log(error);
     }
-    else
-    if(opcionCocina == 3){
-        rl.question("¿Cual es la posicion del producto a eliminar?",(el)=>{
-            productos.splice(el, 1);
-            productos.forEach((productos, indice) =>{
-            console.log(indice + 1, " " + productos);
-});
-rl.close();
-    });
-    
-    }
-    else
-    if(opcionCocina == 4){
-        console.log("MENÚ");
-        console.log("");
-
-        console.log("1 - Productos baratos");
-        console.log("2 - Productos caros");
-        console.log("3 - Bebidas");
-        console.log("4 - Postres");
-
-        rl.question("Elija una opción", (opcion2)=>{
-            if(opcion2 == 1){
-                console.log(productosBaratos);
-            }else
-                if(opcion2 == 2){
-                console.log(productosCaros);
-            }else
-                if(opcionCocina == 3){
-                    rl.question("Introduce el nombre",(nomb)=>{
-                        function encuentraBebida(bebida){
-                            return bebida.producto === nomb;
-                        }
-                        let mBebida = productos.find(bebida=>encuentraBebida(bebida));
-                        console.log(mBebida);
-                    });
-                }
-
-            rl.close();
-        });
-        
-
-        
+    console.log(pedido.status);
+}
 
 
-    
-    }
+async function prueba() {
+    await mainCocina(listaProductos, "Jenny");
+}
 
-});
+prueba();
 
-*/
