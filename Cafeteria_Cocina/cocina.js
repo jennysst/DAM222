@@ -25,6 +25,7 @@ const listaProductos=[{nombreProducto: "Espresso", precio: 100, categoría: "beb
 const listaPedidos=new Map();
 
 listaPedidos.set("Jenny",{listaProductosDelPedido: [1, 2, 3], subtotal: 130, status: false, descripcion: ""});
+listaPedidos.set("Dulce ",{listaProductosDelPedido: [1, 4, 3], subtotal: 160, status: false, descripcion: ""});
 
 const listaPromociones=[{productoEnPromocion: 1 , mensaje: "2x1 en Espresso"}];
 
@@ -412,7 +413,7 @@ async function filtros(array) {
     }while(opcionBusqueda != 7)
 }
 
-async function mainCocina(array, nombrePedido) {
+async function mainCocina(array) {
     let opcionCocina;
     do{
         menuCocina();
@@ -428,7 +429,7 @@ async function mainCocina(array, nombrePedido) {
         } else if(opcionCocina == 4){
             await filtros(array);
         } else if(opcionCocina == 5){
-            await statusPedido(nombrePedido);
+            await seleccionarPedido();
         } 
 
     }while(opcionCocina != 6)
@@ -475,9 +476,47 @@ async function statusPedido(nombrePedido) {
     console.log(pedido.status);
 }
 
+async function seleccionarPedido(){
+    if(listaPedidos.size === 0){
+        console.log("xx - No hay pedidos - xx");
+        return;
+    }
+
+    console.log("-------- PEDIDOS --------");
+    let numero = 1;
+    for(let [nombrePedido, pedido] of listaPedidos){
+        console.log(numero, " ", nombrePedido);
+
+        pedido.listaProductosDelPedido.forEach((idProducto) => {
+            let producto = listaProductos.find((producto) => {
+                 return producto.id === idProducto;
+         });
+          console.log(" ", producto.nombreProducto);
+    });
+        console.log(" Subtotal: $", pedido.subtotal);
+        console.log(" ");
+        numero++;
+    }
+    let opcionPedido = await preguntar("Selecciona el pedido");
+
+    if(opcionPedido < 1 || opcionPedido > listaPedidos.size){
+        console.log("xx - OPCIÓN NO VALIDA - xx");
+        seleccionarPedido();
+        return;
+    }
+
+    let numeroActual = 1;
+    for(let [nombrePedido, pedido]of listaPedidos){
+        if(numeroActual == opcionPedido){
+            await statusPedido(nombrePedido);
+            return
+        }
+        numeroActual++;
+    }
+}
 
 async function prueba() {
-    await mainCocina(listaProductos, "Jenny");
+    await mainCocina(listaProductos);
 }
 
 prueba();
