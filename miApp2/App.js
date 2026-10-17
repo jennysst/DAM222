@@ -11,24 +11,11 @@ export default function App() {
   return (
     <View style={styles.container}> 
 
-      <Text>Hola mundo RN!</Text>
-      <Image source={require("./assets/wave.png")} ></Image>
+      <Perfil nombre = "Jennyfer" carrera = "Redes" materia = "Movil" cuatri = "4"/>
 
-      <Text>---------------------------------------</Text>
-      <Saludo></Saludo>
-      <Saludo/>
+      <Perfil nombre = "Dulcesita" carrera = "Redes" materia = "Movil" cuatri = "4"/>
 
-      <Text>---------------------------------------</Text>
-      <Saludos2></Saludos2>
-      <Saludos2/>
-    
-      <Text>---------------------------------------</Text>
-      <Perfil></Perfil>
-
-      <Text> </Text>
-
-      <Perfil/>
-
+      <Perfil nombre = "Karlota" carrera = "Redes" materia = "Movil" cuatri = "4"/>
 
       <StatusBar style="auto" />
     </View>
