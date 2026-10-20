@@ -11,11 +11,11 @@ export default function App() {
   return (
     <View style={styles.container}> 
 
-      <Perfil nombre = "Jennyfer" carrera = "Redes" materia = "Movil" cuatri = "4"/>
+      <Perfil style = {styles.tarjeta1} nombre = "Jennyfer" carrera = "Redes" materia = "Movil" cuatri = "4"/>
 
-      <Perfil nombre = "Dulcesita" carrera = "Redes" materia = "Movil" cuatri = "4"/>
+      <Perfil style = {styles.tarjeta2} nombre = "Dulcesita" carrera = "Redes" materia = "Movil" cuatri = "4"/>
 
-      <Perfil nombre = "Karlota" carrera = "Redes" materia = "Movil" cuatri = "4"/>
+      <Perfil style = {styles.tarjeta3} nombre = "Karlota" carrera = "Redes" materia = "Movil" cuatri = "4"/>
 
       <StatusBar style="auto" />
     </View>
@@ -26,8 +26,12 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    flexDirection: 'column',
+    backgroundColor: '#ffffff',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
   },
+  tarjeta1: {backgroundColor: 'pink'},
+  tarjeta2: {backgroundColor: 'red'},
+  tarjeta3: {backgroundColor: 'yellow'},
 });
