@@ -9,9 +9,9 @@ import PressableScreen from './PressableScreen';
 import TextInputScreen from './TextInputScreen';
 import FlatListScreen from './FlatListScreen';
 import ImageBackgroungScreen from './ImageBackgroungScreen';
-import ModalScreen from './ModalScreen';
+import ModalBottomSheet from './ModalBottomSheet'
 import ActivityIndicatorScreen from './ActivityIndicatorScreen';
-
+import SwutchScreen from '../components/SwutchScreen';
 
 /* 2 - Zona del main */
 export default function MenuScreen() {
@@ -32,7 +32,7 @@ export default function MenuScreen() {
         case 'imagebackgroungscreen':
             return <ImageBackgroungScreen/>
         case 'modalscreen':
-            return <ModalScreen/>
+            return <ModalBottomSheet/>
         case 'activityindicatorscreen':
             return <ActivityIndicatorScreen/>
         case 'menu':
