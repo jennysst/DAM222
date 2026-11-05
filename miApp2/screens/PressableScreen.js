@@ -13,7 +13,7 @@ export default function PressableScreen() {
     return (
 
         
-        <View style = {[styles, container, {backgroundColor: oscuro ? '#000000': '#FFFFFF'}]}> 
+        <View style = {[styles.container, {backgroundColor: oscuro ? '#000000': '#FFFFFF'}]}> 
 
             <Pressable>
                 <Text> Presioname </Text>

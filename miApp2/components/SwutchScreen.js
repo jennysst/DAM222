@@ -5,7 +5,7 @@ export default function SwutchScreen ( {oscuro, cambiarModo} ){
     return(
         <View>
             <Text
-                style = {[StyleSheet, titulo, {color: oscuro ? '#FFFFFF' : '#000000'}]}
+                style = {[StyleSheet.titulo, {color: oscuro ? '#FFFFFF' : '#000000'}]}
             > Modo Oscuro</Text>
             <Switch 
                 value = {oscuro}
